@@ -57,7 +57,8 @@ public class SensexPowerStrip extends BaseStrategy {
     // ── Risk-management defaults ────────────────────────────────────────
     private static final double TARGET_PERCENT = 100.0;
     private static final double STOP_LOSS_PERCENT = 40.0;
-    private static final LocalTime TIME_EXIT = LocalTime.of(15, 10);
+    private static final LocalTime TIME_EXIT = LocalTime.of(14, 55);
+    private static final LocalTime ENTRY_TIME = LocalTime.of(9, 32);
     private static final ZoneId IST = ZoneId.of("Asia/Kolkata");
 
     // ── Dependencies ────────────────────────────────────────────────────
@@ -105,6 +106,12 @@ public class SensexPowerStrip extends BaseStrategy {
      */
     @Override
     public void onEntry() {
+        LocalTime now = LocalTime.now(IST);
+        if (now.isBefore(ENTRY_TIME)) {
+            log("[{}] Entry blocked — before {} IST", getConfig().getStrategyName(), ENTRY_TIME);
+            return;
+        }
+
         double spotPrice = marketDataProvider.getSpotPrice(INDEX);
         int atmStrike = roundToStrike(spotPrice);
         String expiry = marketDataProvider.getExpiry(INDEX, EXPIRY_POLICY);

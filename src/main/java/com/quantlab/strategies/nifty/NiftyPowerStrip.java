@@ -51,7 +51,8 @@ public class NiftyPowerStrip extends BaseStrategy {
     private static final double STRIP_TARGET_PCT = 1.0;
     private static final double STRIP_SL_PCT = 0.4;
     private static final double IV_CRUSH_EXIT = 0.30;
-    private static final LocalTime TIME_EXIT = LocalTime.of(14, 30);
+    private static final LocalTime TIME_EXIT = LocalTime.of(14, 55);
+    private static final LocalTime ENTRY_TIME = LocalTime.of(9, 32);
     private static final ZoneId IST = ZoneId.of("Asia/Kolkata");
 
     private static final int CE_QTY = 1;
@@ -97,6 +98,12 @@ public class NiftyPowerStrip extends BaseStrategy {
      */
     @Override
     public void onEntry() {
+        LocalTime now = LocalTime.now(IST);
+        if (now.isBefore(ENTRY_TIME)) {
+            logger.info("[{}] Entry blocked — before {} IST", STRATEGY_NAME, ENTRY_TIME);
+            return;
+        }
+
         double spot = marketDataProvider.getSpotPrice(UNDERLYING);
         atmStrike = roundToStrikeInterval(spot);
 

@@ -43,7 +43,8 @@ public class BankNiftyVolBurst extends BaseStrategy {
     private static final double TARGET_PCT = 0.80;
     private static final double STOP_LOSS_PCT = 0.35;
     private static final double IV_EXPAND_THRESHOLD = 0.40;
-    private static final LocalTime TIME_EXIT = LocalTime.of(13, 0);
+    private static final LocalTime TIME_EXIT = LocalTime.of(14, 55);
+    private static final LocalTime ENTRY_TIME = LocalTime.of(9, 32);
     private static final ZoneId IST = ZoneId.of("Asia/Kolkata");
 
     private final OrderService orderService;
@@ -89,6 +90,12 @@ public class BankNiftyVolBurst extends BaseStrategy {
      */
     @Override
     public void onEntry() {
+        LocalTime now = LocalTime.now(ZoneId.of("Asia/Kolkata"));
+        if (now.isBefore(ENTRY_TIME)) {
+            log("[{}] Entry blocked — before {} IST", STRATEGY_NAME, ENTRY_TIME);
+            return;
+        }
+
         double spot = marketDataProvider.getSpotPrice(UNDERLYING);
         int atmStrike = roundToStrike(spot);
         String expiry = marketDataProvider.getCurrentMonthExpiry(UNDERLYING);

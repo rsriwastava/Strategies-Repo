@@ -55,8 +55,8 @@ public class NiftyWideVol extends BaseStrategy {
     private static final int STRANGLE_OFFSET = 2;
     private static final double IV_EXPAND_EXIT = 0.40;
     private static final double VIX_ENTRY_THRESHOLD = 13.0;
-    private static final int TIME_EXIT_HOUR = 13;
-    private static final LocalTime TIME_EXIT = LocalTime.of(TIME_EXIT_HOUR, 0);
+    private static final LocalTime TIME_EXIT = LocalTime.of(14, 55);
+    private static final LocalTime ENTRY_TIME = LocalTime.of(9, 32);
     private static final ZoneId IST = ZoneId.of("Asia/Kolkata");
 
     private static final int LOT_QTY = 1;
@@ -102,6 +102,12 @@ public class NiftyWideVol extends BaseStrategy {
      */
     @Override
     public void onEntry() {
+        LocalTime now = LocalTime.now(IST);
+        if (now.isBefore(ENTRY_TIME)) {
+            logger.info("[{}] Entry blocked — before {} IST", STRATEGY_NAME, ENTRY_TIME);
+            return;
+        }
+
         double vix = marketDataProvider.getVIX();
         if (vix >= VIX_ENTRY_THRESHOLD) {
             logger.info("{}: VIX {} >= threshold {}. Skipping entry.", STRATEGY_NAME, vix, VIX_ENTRY_THRESHOLD);

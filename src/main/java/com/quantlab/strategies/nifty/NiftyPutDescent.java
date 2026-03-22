@@ -54,7 +54,8 @@ public class NiftyPutDescent extends BaseStrategy {
     private static final int FAR_OFFSET = 4;
     private static final int BREAKEVEN_BUFFER = 1;
     private static final double TARGET_PROXIMITY_PCT = 0.005;
-    private static final LocalTime TIME_EXIT = LocalTime.of(14, 30);
+    private static final LocalTime TIME_EXIT = LocalTime.of(14, 55);
+    private static final LocalTime ENTRY_TIME = LocalTime.of(9, 32);
     private static final ZoneId IST = ZoneId.of("Asia/Kolkata");
 
     private static final int LOT_QTY = 1;
@@ -100,6 +101,12 @@ public class NiftyPutDescent extends BaseStrategy {
      */
     @Override
     public void onEntry() {
+        LocalTime now = LocalTime.now(IST);
+        if (now.isBefore(ENTRY_TIME)) {
+            logger.info("[{}] Entry blocked — before {} IST", STRATEGY_NAME, ENTRY_TIME);
+            return;
+        }
+
         double spot = marketDataProvider.getSpotPrice(UNDERLYING);
         int atmStrike = roundToStrikeInterval(spot);
         middleStrike = atmStrike - MIDDLE_OFFSET * STRIKE_INTERVAL;

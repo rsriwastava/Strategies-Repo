@@ -44,7 +44,8 @@ public class BankNiftyPowerStrap extends BaseStrategy {
     private static final double TARGET_PCT = 1.00;
     private static final double STOP_LOSS_PCT = 0.40;
     private static final double IV_CRUSH_THRESHOLD = 0.30;
-    private static final LocalTime TIME_EXIT = LocalTime.of(14, 30);
+    private static final LocalTime TIME_EXIT = LocalTime.of(14, 55);
+    private static final LocalTime ENTRY_TIME = LocalTime.of(9, 32);
     private static final ZoneId IST = ZoneId.of("Asia/Kolkata");
 
     private final OrderService orderService;
@@ -90,6 +91,12 @@ public class BankNiftyPowerStrap extends BaseStrategy {
      */
     @Override
     public void onEntry() {
+        LocalTime now = LocalTime.now(ZoneId.of("Asia/Kolkata"));
+        if (now.isBefore(ENTRY_TIME)) {
+            log("[{}] Entry blocked — before {} IST", STRATEGY_NAME, ENTRY_TIME);
+            return;
+        }
+
         double spot = marketDataProvider.getSpotPrice(UNDERLYING);
         int atmStrike = roundToStrike(spot);
         String expiry = marketDataProvider.getCurrentMonthExpiry(UNDERLYING);

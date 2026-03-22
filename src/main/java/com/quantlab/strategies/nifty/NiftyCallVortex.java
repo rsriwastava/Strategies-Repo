@@ -53,7 +53,8 @@ public class NiftyCallVortex extends BaseStrategy {
     private static final int OTM_OFFSET_MULTIPLIER = 2;
     private static final double VIX_ENTRY_THRESHOLD = 15.0;
     private static final double IV_DROP_EXIT_PCT = 0.20;
-    private static final LocalTime TIME_EXIT = LocalTime.of(14, 30);
+    private static final LocalTime TIME_EXIT = LocalTime.of(14, 55);
+    private static final LocalTime ENTRY_TIME = LocalTime.of(9, 32);
     private static final ZoneId IST = ZoneId.of("Asia/Kolkata");
 
     private static final int SELL_QTY = 1;
@@ -98,6 +99,12 @@ public class NiftyCallVortex extends BaseStrategy {
      */
     @Override
     public void onEntry() {
+        LocalTime now = LocalTime.now(IST);
+        if (now.isBefore(ENTRY_TIME)) {
+            logger.info("[{}] Entry blocked — before {} IST", STRATEGY_NAME, ENTRY_TIME);
+            return;
+        }
+
         double vix = marketDataProvider.getVIX();
         if (vix >= VIX_ENTRY_THRESHOLD) {
             logger.info("{}: VIX {} >= threshold {}. Skipping entry.", STRATEGY_NAME, vix, VIX_ENTRY_THRESHOLD);
